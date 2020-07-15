@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "907924182050",
+    "firebase_url": "https://quizz-app-cdf56.firebaseio.com",
+    "project_id": "quizz-app-cdf56",
+    "storage_bucket": "quizz-app-cdf56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907924182050:android:c11f0d3d5ded2e69f2267b",
+        "android_client_info": {
+          "package_name": "brainee.innhub.qzapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907924182050-eig12nsfggkt3nit6sj757jffjv4qf1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1lyJHSHFivjQd_BGPnrX-zgjNqjpORUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "907924182050-eig12nsfggkt3nit6sj757jffjv4qf1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
