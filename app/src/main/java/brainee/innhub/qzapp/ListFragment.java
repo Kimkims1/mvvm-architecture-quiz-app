@@ -21,6 +21,8 @@ public class ListFragment extends Fragment {
     private RecyclerView listView;
     private QuizListViewModel quizListViewModel;
 
+    private QuizListAdapter adapter;
+
     public ListFragment() {
         // Required empty public constructor
     }
@@ -37,6 +39,7 @@ public class ListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView = view.findViewById(R.id.list_view);
+        adapter = new QuizListAdapter();
     }
 
     @Override

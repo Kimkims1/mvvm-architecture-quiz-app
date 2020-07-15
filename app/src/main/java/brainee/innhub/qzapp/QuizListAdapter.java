@@ -6,7 +6,16 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.List;
+
 public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizViewHolder> {
+
+    private List<QuizListModel> quizListModels;
+
+    public void setQuizListModels(List<QuizListModel> quizListModels) {
+        this.quizListModels = quizListModels;
+    }
+
     @NonNull
     @Override
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
