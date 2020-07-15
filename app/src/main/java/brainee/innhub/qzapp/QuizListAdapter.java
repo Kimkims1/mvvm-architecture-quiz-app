@@ -44,7 +44,11 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizVi
                 .placeholder(R.drawable.placeholder_image)
                 .into(holder.list_Image);
 
-        holder.list_desc.setText(quizListModels.get(position).getDesc());
+        String listDescription = quizListModels.get(position).getDesc();
+        if (listDescription.length() > 150){
+            listDescription = listDescription.substring(0, 150);
+        }
+        holder.list_desc.setText(listDescription + "...");
         holder.list_level.setText(quizListModels.get(position).getLevel());
     }
 
