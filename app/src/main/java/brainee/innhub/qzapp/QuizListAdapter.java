@@ -1,7 +1,11 @@
 package brainee.innhub.qzapp;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,22 +23,44 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizVi
     @NonNull
     @Override
     public QuizViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_list_item, parent, false);
+
+        return new QuizViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull QuizViewHolder holder, int position) {
 
+        holder.list_title.setText(quizListModels.get(position).getName());
+
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        if (quizListModels == null){
+            return 0;
+        }else {
+            return quizListModels.size();
+        }
     }
 
     public class QuizViewHolder extends RecyclerView.ViewHolder {
+
+        private ImageView list_Image;
+        private TextView list_title;
+        private TextView list_desc;
+        private TextView list_level;
+        private Button list_btn;
+
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            list_Image = itemView.findViewById(R.id.list_image);
+            list_title = itemView.findViewById(R.id.list_title);
+            list_desc = itemView.findViewById(R.id.list_description);
+            list_level = itemView.findViewById(R.id.list_difficult);
+            list_btn = itemView.findViewById(R.id.list_btn);
+
         }
     }
 }

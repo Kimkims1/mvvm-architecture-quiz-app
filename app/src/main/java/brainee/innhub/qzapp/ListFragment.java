@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -40,6 +41,10 @@ public class ListFragment extends Fragment {
 
         listView = view.findViewById(R.id.list_view);
         adapter = new QuizListAdapter();
+
+        listView.setLayoutManager(new LinearLayoutManager(getContext()));
+        listView.setHasFixedSize(true);
+        listView.setAdapter(adapter);
     }
 
     @Override
@@ -50,6 +55,9 @@ public class ListFragment extends Fragment {
         quizListViewModel.getQuizListModelData().observe(getViewLifecycleOwner(), new Observer<List<QuizListModel>>() {
             @Override
             public void onChanged(List<QuizListModel> quizListModels) {
+
+                adapter.setQuizListModels(quizListModels);
+                adapter.notifyDataSetChanged();
 
             }
         });
