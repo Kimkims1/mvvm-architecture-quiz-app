@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
@@ -23,6 +26,11 @@ public class ListFragment extends Fragment {
     private QuizListViewModel quizListViewModel;
 
     private QuizListAdapter adapter;
+
+    private ProgressBar list_progress;
+
+    private Animation fadeInAnim;
+    private Animation fadeOutAnim;
 
     public ListFragment() {
         // Required empty public constructor
@@ -40,7 +48,11 @@ public class ListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView = view.findViewById(R.id.list_view);
+        list_progress = view.findViewById(R.id.list_progress);
         adapter = new QuizListAdapter();
+
+        fadeInAnim = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
+        fadeOutAnim = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
 
         listView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setHasFixedSize(true);
@@ -56,6 +68,8 @@ public class ListFragment extends Fragment {
             @Override
             public void onChanged(List<QuizListModel> quizListModels) {
 
+                listView.startAnimation(fadeInAnim);
+                list_progress.startAnimation(fadeOutAnim);
                 adapter.setQuizListModels(quizListModels);
                 adapter.notifyDataSetChanged();
 
