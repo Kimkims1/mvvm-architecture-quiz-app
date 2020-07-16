@@ -17,6 +17,11 @@ import java.util.List;
 public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizViewHolder> {
 
     private List<QuizListModel> quizListModels;
+    private onQuizListItemClicked onQuizListItemClicked;
+
+    public QuizListAdapter(QuizListAdapter.onQuizListItemClicked onQuizListItemClicked) {
+        this.onQuizListItemClicked = onQuizListItemClicked;
+    }
 
     public void setQuizListModels(List<QuizListModel> quizListModels) {
         this.quizListModels = quizListModels;
@@ -45,7 +50,7 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizVi
                 .into(holder.list_Image);
 
         String listDescription = quizListModels.get(position).getDesc();
-        if (listDescription.length() > 150){
+        if (listDescription.length() > 150) {
             listDescription = listDescription.substring(0, 150);
         }
         holder.list_desc.setText(listDescription + "...");
@@ -54,14 +59,14 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizVi
 
     @Override
     public int getItemCount() {
-        if (quizListModels == null){
+        if (quizListModels == null) {
             return 0;
-        }else {
+        } else {
             return quizListModels.size();
         }
     }
 
-    public class QuizViewHolder extends RecyclerView.ViewHolder {
+    public class QuizViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView list_Image;
         private TextView list_title;
@@ -78,6 +83,17 @@ public class QuizListAdapter extends RecyclerView.Adapter<QuizListAdapter.QuizVi
             list_level = itemView.findViewById(R.id.list_difficult);
             list_btn = itemView.findViewById(R.id.list_btn);
 
+            list_btn.setOnClickListener(this);
+
         }
+
+        @Override
+        public void onClick(View v) {
+            onQuizListItemClicked.onItemClicked(getAdapterPosition());
+        }
+    }
+
+    public interface onQuizListItemClicked {
+        void onItemClicked(int position);
     }
 }
