@@ -205,27 +205,32 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
         switch (v.getId()) {
             case R.id.quiz_option_one:
-                answerSelected(option_one_btn.getText());
+                verifyAnswer(option_one_btn);
                 break;
             case R.id.quiz_option_two:
-                answerSelected(option_two_btn.getText());
+                verifyAnswer(option_two_btn);
                 break;
             case R.id.quiz_option_three:
-                answerSelected(option_three_btn.getText());
+                verifyAnswer(option_three_btn);
                 break;
         }
     }
 
-    private void answerSelected(CharSequence selectedAnswer) {
+    private void verifyAnswer(Button selectedAnswerBtn) {
 
         if (canAnswer) {
-            if (questionsToAnswer.get(currentQuestion).getAnswer().equals(selectedAnswer)) {
+            if (questionsToAnswer.get(currentQuestion - 1).getAnswer().equals(selectedAnswerBtn.getText())) {
                 //Correct Answer
+                selectedAnswerBtn.setBackground(getResources().getDrawable(R.drawable.correct_ans_btn_bg, null));
             } else {
                 //Wrong Answer
+                selectedAnswerBtn.setBackground(getResources().getDrawable(R.drawable.wrong_ans_btn_bg, null));
             }
         }
 
         canAnswer = false;
+
+        /*Cancel/Stop the timer*/
+        countDownTimer.cancel();
     }
 }
