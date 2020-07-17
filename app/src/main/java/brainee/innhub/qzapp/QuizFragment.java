@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,7 +44,7 @@ public class QuizFragment extends Fragment {
 
 
     private List<QuestionsModel> allQuestionsList = new ArrayList<>();
-    private long totalQuestionsToAnswer;
+    private long totalQuestionsToAnswer = 10;
     private List<QuestionsModel> questionsToAnswer = new ArrayList<>();
     private CountDownTimer countDownTimer;
 
@@ -91,8 +92,8 @@ public class QuizFragment extends Fragment {
 
                         if (task.isSuccessful()) {
                             allQuestionsList = task.getResult().toObjects(QuestionsModel.class);
-                            pickQuestions();
-                            loadUi();
+                           pickQuestions();
+                           /* loadUi();*/
                         } else {
                             quizTitle.setText("Error loading data");
                         }
@@ -170,6 +171,7 @@ public class QuizFragment extends Fragment {
 
             questionsToAnswer.add(allQuestionsList.get(randomNumber));
             allQuestionsList.remove(randomNumber);
+            Toast.makeText(getContext(), "Questions: "+ i + ":" + questionsToAnswer.get(i).getQuestion(), Toast.LENGTH_SHORT).show();
         }
     }
 
