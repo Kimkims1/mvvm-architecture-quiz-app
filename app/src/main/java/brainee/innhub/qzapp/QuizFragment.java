@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
@@ -18,18 +20,25 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private FirebaseFirestore firestore;
+
+    private String quizName;
     private String quizId;
     private TextView quizTitle;
+
+    private String currentUserId;
+    private FirebaseAuth firebaseAuth;
 
     private Button option_one_btn;
     private Button option_two_btn;
@@ -44,8 +53,12 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private boolean canAnswer = false;
     private int currentQuestion;
 
+    private NavController navController;
+
     private int correctAnswer = 0;
     private int wrongAnswer = 0;
+
+    private int notAnswered = 0;
 
 
     private List<QuestionsModel> allQuestionsList = new ArrayList<>();
@@ -74,19 +87,32 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        navController = Navigation.findNavController(view);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        //Get User Id
+        if (firebaseAuth.getCurrentUser() != null) {
+            currentUserId = firebaseAuth.getCurrentUser().getUid();
+        } else {
+            //Go back to Home Page
+
+        }
+
         quizTitle = view.findViewById(R.id.quiz_title);
         option_one_btn = view.findViewById(R.id.quiz_option_one);
         option_two_btn = view.findViewById(R.id.quiz_option_two);
         option_three_btn = view.findViewById(R.id.quiz_option_three);
         nextBtn = view.findViewById(R.id.quiz_next_btn);
         questionFeedback = view.findViewById(R.id.quiz_question_feedback);
-        questionText = view.findViewById(R.id.quiz_question);
+        questionText = view.findViewById(R.id.quiz_question_fetch);
         questionTime = view.findViewById(R.id.quiz_question_time);
         questionProgress = view.findViewById(R.id.quiz_question_progress);
         questionNumber = view.findViewById(R.id.quiz_question_number);
 
         //Get quizId
         quizId = QuizFragmentArgs.fromBundle(getArguments()).getQuizId();
+        quizName = QuizFragmentArgs.fromBundle(getArguments()).getQuizName();
+
 
         totalQuestionsToAnswer = QuizFragmentArgs.fromBundle(getArguments()).getTotalQuestions();
 
@@ -111,11 +137,13 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
         option_one_btn.setOnClickListener(this);
         option_two_btn.setOnClickListener(this);
         option_three_btn.setOnClickListener(this);
+
+        nextBtn.setOnClickListener(this);
     }
 
     private void loadUi() {
         //Quiz Data loaded , load the UI
-        quizTitle.setText("Quiz data loaded");
+        quizTitle.setText(quizName);
         questionText.setText("Load First Question");
 
         enableOptions();
@@ -169,7 +197,11 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onFinish() {
 
-                canAnswer = true;
+                questionFeedback.setText("Times up! No answer was submitted");
+                questionFeedback.setTextColor(getResources().getColor(R.color.colorPrimary, null));
+                canAnswer = false;
+                notAnswered++;
+                showNextButton();
             }
         };
         countDownTimer.start();
@@ -216,14 +248,66 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
             case R.id.quiz_option_three:
                 verifyAnswer(option_three_btn);
                 break;
+            case R.id.quiz_next_btn:
+                if (currentQuestion == totalQuestionsToAnswer) {
+
+                    //Load results
+                    submitResults();
+                } else {
+                    currentQuestion++;
+                    loadQuestions(currentQuestion);
+                    resetOptions();
+                }
+                break;
         }
     }
 
+    private void submitResults() {
+        HashMap<String, Object> resultMap = new HashMap<>();
+        resultMap.put("correct", correctAnswer);
+        resultMap.put("wrong", wrongAnswer);
+        resultMap.put("unanswered", notAnswered);
+
+        firestore.collection("QuizList")
+                .document(quizId)
+                .collection("Results")
+                .document(currentUserId)
+                .set(resultMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            //Go to results page
+                            QuizFragmentDirections.ActionQuizFragmentToResultFragment action = QuizFragmentDirections.actionQuizFragmentToResultFragment();
+                            action.setQuizId(quizId);
+                            navController.navigate(action);
+                        } else {
+                            //Show Error
+                            quizTitle.setText(task.getException().getMessage());
+                        }
+                    }
+                });
+
+    }
+
+    private void resetOptions() {
+        option_one_btn.setBackground(getResources().getDrawable(R.drawable.outline_light_btn_bg, null));
+        option_two_btn.setBackground(getResources().getDrawable(R.drawable.outline_light_btn_bg, null));
+        option_three_btn.setBackground(getResources().getDrawable(R.drawable.outline_light_btn_bg, null));
+
+        option_one_btn.setTextColor(getResources().getColor(R.color.colorLightText, null));
+        option_two_btn.setTextColor(getResources().getColor(R.color.colorLightText, null));
+        option_three_btn.setTextColor(getResources().getColor(R.color.colorLightText, null));
+
+        questionFeedback.setVisibility(View.INVISIBLE);
+        nextBtn.setVisibility(View.INVISIBLE);
+        nextBtn.setEnabled(true);
+    }
+
     private void verifyAnswer(Button selectedAnswerBtn) {
-
-        selectedAnswerBtn.setTextColor(getResources().getColor(R.color.colorDark, null));
-
         if (canAnswer) {
+            selectedAnswerBtn.setTextColor(getResources().getColor(R.color.colorDark, null));
+
             if (questionsToAnswer.get(currentQuestion - 1).getAnswer().equals(selectedAnswerBtn.getText())) {
                 //Correct Answer
                 correctAnswer++;
@@ -238,7 +322,7 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
                 selectedAnswerBtn.setBackground(getResources().getDrawable(R.drawable.wrong_ans_btn_bg, null));
 
                 /*Set feedback Text*/
-                questionFeedback.setText("Wrong Answer \n Correct Answer :" + questionsToAnswer.get(currentQuestion - 1).getAnswer());
+                questionFeedback.setText("Wrong Answer \n \n Correct Answer :" + questionsToAnswer.get(currentQuestion - 1).getAnswer());
                 questionFeedback.setTextColor(getResources().getColor(R.color.colorAccent, null));
 
             }
@@ -253,6 +337,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showNextButton() {
+        if (currentQuestion == totalQuestionsToAnswer) {
+            nextBtn.setText("Submit Results");
+        }
         questionFeedback.setVisibility(View.VISIBLE);
         nextBtn.setVisibility(View.VISIBLE);
         nextBtn.setEnabled(true);
