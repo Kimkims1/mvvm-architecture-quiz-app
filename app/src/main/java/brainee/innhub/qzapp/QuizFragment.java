@@ -44,6 +44,9 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
     private boolean canAnswer = false;
     private int currentQuestion;
 
+    private int correctAnswer = 0;
+    private int wrongAnswer = 0;
+
 
     private List<QuestionsModel> allQuestionsList = new ArrayList<>();
     private long totalQuestionsToAnswer = 10;
@@ -218,13 +221,26 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private void verifyAnswer(Button selectedAnswerBtn) {
 
+        selectedAnswerBtn.setTextColor(getResources().getColor(R.color.colorDark, null));
+
         if (canAnswer) {
             if (questionsToAnswer.get(currentQuestion - 1).getAnswer().equals(selectedAnswerBtn.getText())) {
                 //Correct Answer
+                correctAnswer++;
                 selectedAnswerBtn.setBackground(getResources().getDrawable(R.drawable.correct_ans_btn_bg, null));
+
+                /*Set feedback Text*/
+                questionFeedback.setText("Correct Answer");
+                questionFeedback.setTextColor(getResources().getColor(R.color.colorPrimary, null));
             } else {
                 //Wrong Answer
+                wrongAnswer++;
                 selectedAnswerBtn.setBackground(getResources().getDrawable(R.drawable.wrong_ans_btn_bg, null));
+
+                /*Set feedback Text*/
+                questionFeedback.setText("Wrong Answer \n Correct Answer :" + questionsToAnswer.get(currentQuestion - 1).getAnswer());
+                questionFeedback.setTextColor(getResources().getColor(R.color.colorAccent, null));
+
             }
         }
 
@@ -232,5 +248,13 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
         /*Cancel/Stop the timer*/
         countDownTimer.cancel();
+
+        showNextButton();
+    }
+
+    private void showNextButton() {
+        questionFeedback.setVisibility(View.VISIBLE);
+        nextBtn.setVisibility(View.VISIBLE);
+        nextBtn.setEnabled(true);
     }
 }
