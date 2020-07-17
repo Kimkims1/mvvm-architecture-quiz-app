@@ -41,6 +41,7 @@ public class QuizFragment extends Fragment {
     private TextView questionTime;
     private ProgressBar questionProgress;
     private TextView questionNumber;
+    private boolean canAnswer = false;
 
 
     private List<QuestionsModel> allQuestionsList = new ArrayList<>();
@@ -82,20 +83,23 @@ public class QuizFragment extends Fragment {
 
         //Get quizId
         quizId = QuizFragmentArgs.fromBundle(getArguments()).getQuizId();
+
         totalQuestionsToAnswer = QuizFragmentArgs.fromBundle(getArguments()).getTotalQuestions();
 
         firestore = FirebaseFirestore.getInstance();
-        firestore.collection("QuizList").document(quizId).collection("Questions").get()
+        firestore.collection("QuizList")
+                .document(quizId).collection("Questions")
+                .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         if (task.isSuccessful()) {
                             allQuestionsList = task.getResult().toObjects(QuestionsModel.class);
-                           pickQuestions();
-                           /* loadUi();*/
+                            pickQuestions();
+                            loadUi();
                         } else {
-                            quizTitle.setText("Error loading data");
+                            quizTitle.setText("Error :" + task.getException().getMessage());
                         }
                     }
                 });
@@ -114,7 +118,7 @@ public class QuizFragment extends Fragment {
 
     private void loadQuestions(int questNumber) {
         /*Set Question Number*/
-        questionNumber.setText(questNumber);
+        // questionNumber.setText(questNumber);
 
         /*Load question text*/
         questionText.setText(questionsToAnswer.get(questNumber).getQuestion());
@@ -124,28 +128,39 @@ public class QuizFragment extends Fragment {
         option_two_btn.setText(questionsToAnswer.get(questNumber).getOption_b());
         option_three_btn.setText(questionsToAnswer.get(questNumber).getOption_c());
 
+        /*Set can answer to true*/
+        canAnswer = true;
+
         //Start Question Timer
         startTimer(questNumber);
     }
 
-    private void startTimer(int questNumber) {
+    private void startTimer(int questionNumber) {
         /*Set timer text*/
-        Long timeToAnswer = questionsToAnswer.get(questNumber).getTimer();
+        final Long timeToAnswer = questionsToAnswer.get(questionNumber).getTimer();
         questionText.setText(timeToAnswer.toString());
 
+        /*Show Timer progress*/
+        questionProgress.setVisibility(View.VISIBLE);
+
         /*Start Countdown*/
-        countDownTimer =  new CountDownTimer(timeToAnswer * 1000, 1000) {
+        countDownTimer = new CountDownTimer(timeToAnswer * 1000, 10) {
 
             @Override
             public void onTick(long millisUntilFinished) {
 
                 //Update time
                 questionTime.setText(millisUntilFinished / 1000 + "");
+
+                /*Progress in percent*/
+                Long percent = millisUntilFinished / (timeToAnswer * 10);
+                questionProgress.setProgress(percent.intValue());
             }
 
             @Override
             public void onFinish() {
 
+                canAnswer = true;
             }
         };
         countDownTimer.start();
@@ -171,7 +186,7 @@ public class QuizFragment extends Fragment {
 
             questionsToAnswer.add(allQuestionsList.get(randomNumber));
             allQuestionsList.remove(randomNumber);
-            Toast.makeText(getContext(), "Questions: "+ i + ":" + questionsToAnswer.get(i).getQuestion(), Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Questions: " + i + ":" + questionsToAnswer.get(i).getQuestion(), Toast.LENGTH_SHORT).show();
         }
     }
 

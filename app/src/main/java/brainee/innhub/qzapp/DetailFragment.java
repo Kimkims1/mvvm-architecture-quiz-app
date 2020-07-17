@@ -74,7 +74,6 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
 
         position = DetailFragmentArgs.fromBundle(getArguments()).getPosition();
 
-        Toast.makeText(getContext(), "Position " + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override
