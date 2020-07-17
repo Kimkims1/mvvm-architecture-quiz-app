@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class QuizFragment extends Fragment {
+public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private FirebaseFirestore firestore;
     private String quizId;
@@ -42,6 +42,7 @@ public class QuizFragment extends Fragment {
     private ProgressBar questionProgress;
     private TextView questionNumber;
     private boolean canAnswer = false;
+    private int currentQuestion;
 
 
     private List<QuestionsModel> allQuestionsList = new ArrayList<>();
@@ -103,6 +104,10 @@ public class QuizFragment extends Fragment {
                         }
                     }
                 });
+
+        option_one_btn.setOnClickListener(this);
+        option_two_btn.setOnClickListener(this);
+        option_three_btn.setOnClickListener(this);
     }
 
     private void loadUi() {
@@ -118,18 +123,19 @@ public class QuizFragment extends Fragment {
 
     private void loadQuestions(int questNumber) {
         /*Set Question Number*/
-        // questionNumber.setText(questNumber);
+        questionNumber.setText(questNumber + "");
 
         /*Load question text*/
-        questionText.setText(questionsToAnswer.get(questNumber).getQuestion());
+        questionText.setText(questionsToAnswer.get(questNumber - 1).getQuestion());
 
         /*Load Options*/
-        option_one_btn.setText(questionsToAnswer.get(questNumber).getOption_a());
-        option_two_btn.setText(questionsToAnswer.get(questNumber).getOption_b());
-        option_three_btn.setText(questionsToAnswer.get(questNumber).getOption_c());
+        option_one_btn.setText(questionsToAnswer.get(questNumber - 1).getOption_a());
+        option_two_btn.setText(questionsToAnswer.get(questNumber - 1).getOption_b());
+        option_three_btn.setText(questionsToAnswer.get(questNumber - 1).getOption_c());
 
         /*Set can answer to true*/
         canAnswer = true;
+        currentQuestion = questNumber;
 
         //Start Question Timer
         startTimer(questNumber);
@@ -137,7 +143,7 @@ public class QuizFragment extends Fragment {
 
     private void startTimer(int questionNumber) {
         /*Set timer text*/
-        final Long timeToAnswer = questionsToAnswer.get(questionNumber).getTimer();
+        final Long timeToAnswer = questionsToAnswer.get(questionNumber - 1).getTimer();
         questionText.setText(timeToAnswer.toString());
 
         /*Show Timer progress*/
@@ -192,5 +198,34 @@ public class QuizFragment extends Fragment {
 
     public static int getRandomInteger(int maximum, int minimum) {
         return ((int) (Math.random() * (maximum - minimum))) + minimum;
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.quiz_option_one:
+                answerSelected(option_one_btn.getText());
+                break;
+            case R.id.quiz_option_two:
+                answerSelected(option_two_btn.getText());
+                break;
+            case R.id.quiz_option_three:
+                answerSelected(option_three_btn.getText());
+                break;
+        }
+    }
+
+    private void answerSelected(CharSequence selectedAnswer) {
+
+        if (canAnswer) {
+            if (questionsToAnswer.get(currentQuestion).getAnswer().equals(selectedAnswer)) {
+                //Correct Answer
+            } else {
+                //Wrong Answer
+            }
+        }
+
+        canAnswer = false;
     }
 }
