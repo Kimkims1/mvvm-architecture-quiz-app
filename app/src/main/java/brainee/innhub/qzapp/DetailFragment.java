@@ -76,7 +76,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         detailsDiff = view.findViewById(R.id.details_difficult_text);
         detailsQuestions = view.findViewById(R.id.details_question_text);
         details_start_btn = view.findViewById(R.id.details_start_btn);
-        detailsScore = view.findViewById(R.id.details_score);
+        detailsScore = view.findViewById(R.id.details_last_score);
 
         details_start_btn.setOnClickListener(this);
 
