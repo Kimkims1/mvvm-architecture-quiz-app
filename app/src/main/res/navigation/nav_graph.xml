@@ -78,5 +78,12 @@
             android:name="quizId"
             app:argType="string"
             android:defaultValue="null" />
+        <action
+            android:id="@+id/action_resultFragment_to_listFragment"
+            app:destination="@id/listFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popUpTo="@id/resultFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

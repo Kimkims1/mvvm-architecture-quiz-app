@@ -19,6 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -29,6 +34,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
     private TextView details_message;
     private TextView detailsDiff;
     private TextView detailsQuestions;
+    private TextView detailsScore;
 
     private Button details_start_btn;
 
@@ -55,6 +61,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_detail, container, false);
+
     }
 
     @Override
@@ -69,6 +76,7 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
         detailsDiff = view.findViewById(R.id.details_difficult_text);
         detailsQuestions = view.findViewById(R.id.details_question_text);
         details_start_btn = view.findViewById(R.id.details_start_btn);
+        detailsScore = view.findViewById(R.id.details_score);
 
         details_start_btn.setOnClickListener(this);
 
@@ -99,8 +107,46 @@ public class DetailFragment extends Fragment implements View.OnClickListener {
                 //Assign value to quiz Variable
                 quizId = quizListModels.get(position).getQuiz_id();
                 totalQuestions = quizListModels.get(position).getQuestions();
+
+                loadResultsData();
             }
         });
+    }
+
+    private FirebaseFirestore firestore;
+    private FirebaseAuth firebaseAuth;
+
+    private void loadResultsData() {
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("QuizList").document(quizId)
+                .collection("Results")
+                .document(firebaseAuth.getCurrentUser().getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot resultSnapshot = task.getResult();
+
+                            Long correct = resultSnapshot.getLong("correct");
+                            Long wrong = resultSnapshot.getLong("wrong");
+                            Long missed = resultSnapshot.getLong("unanswered");
+
+
+                            //Calculate progress
+                            Long total = correct + wrong + missed;
+                            Long percent = (correct * 100) / total;
+
+                            detailsScore.setText(percent + "%");
+                        } else {
+                            //Document doesn't exist
+
+                        }
+                    }
+                });
+
     }
 
     @Override
