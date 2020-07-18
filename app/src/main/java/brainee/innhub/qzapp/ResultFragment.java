@@ -77,9 +77,9 @@ public class ResultFragment extends Fragment {
         quizId = ResultFragmentArgs.fromBundle(getArguments()).getQuizId();
 
         /*Initialize UI Elements*/
-        resultCorrect = view.findViewById(R.id.results_correct_text);
-        resultWrong = view.findViewById(R.id.results_wrong_text);
-        resultMissed = view.findViewById(R.id.results_missed_text);
+        resultCorrect = view.findViewById(R.id.textView_correct_answer);
+        resultWrong = view.findViewById(R.id.textView_wrong_answer);
+        resultMissed = view.findViewById(R.id.textView_qn_missed);
 
         resultHomeBtn = view.findViewById(R.id.results_home_btn);
         resultPercent = view.findViewById(R.id.results_percentage);
