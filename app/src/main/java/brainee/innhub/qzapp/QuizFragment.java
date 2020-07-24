@@ -143,8 +143,8 @@ public class QuizFragment extends Fragment implements View.OnClickListener {
 
     private void loadUi() {
         //Quiz Data loaded , load the UI
-        quizTitle.setText(quizName);
-        questionText.setText("Load First Question");
+        quizTitle.setText("Questions loaded");
+        questionText.setText(quizName);
 
         enableOptions();
 
